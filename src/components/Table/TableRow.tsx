@@ -141,7 +141,11 @@ export default function TableRow({
     // the static ones. They're only ever set on wide web layouts.
     const gridTemplateColumns = dynamicGridTemplateColumns ? [...dynamicGridTemplateColumns] : getGridTemplateColumns(columns);
     const isSelectionCheckboxVisible = selectionEnabled && (isMobileSelectionEnabled || !selectionUsesNarrowLayout);
-    const rowDataSet = {...dataSet, ...TABLE_ROW_DATA_SET, ...(shouldAllowTextSelection ? COPYABLE_ROW_DATA_SET : {})};
+    const rowDataSet = {
+        ...dataSet,
+        ...TABLE_ROW_DATA_SET,
+        ...(shouldAllowTextSelection ? COPYABLE_ROW_DATA_SET : {}),
+    };
 
     const isDisabled = !!disabled || isAccessibilityHidden;
     const isFirstRow = rowIndex === 0;
@@ -189,8 +193,10 @@ export default function TableRow({
         rowHeightStyle,
     ];
 
+    // flexGrow1 instead of flex1: on web, flex: 1 becomes flex-basis: 0%, which WebKit can resolve
+    // against FlashList's items container and stretch the first row over following rows.
     const tableRowContentContainerStyles = [
-        styles.flex1,
+        styles.flexGrow1,
         styles.gap3,
         animatedHighlightStyle,
         isLastRow && styles.tableBottomRadius,
@@ -199,7 +205,7 @@ export default function TableRow({
     ];
 
     const tableRowContentStyles = [
-        styles.flex1,
+        styles.flexGrow1,
         styles.flexRow,
         styles.alignItemsCenter,
         styles.alignContentCenter,
@@ -227,7 +233,10 @@ export default function TableRow({
 
     const renderChildren = (state: PressableStateCallbackType) => {
         if (typeof children === 'function') {
-            return children({...state, hovered: !!state.hovered && !shouldDisableHoverStyle});
+            return children({
+                ...state,
+                hovered: !!state.hovered && !shouldDisableHoverStyle,
+            });
         }
 
         return children;
